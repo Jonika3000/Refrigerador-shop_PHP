@@ -1,0 +1,10 @@
+<<<<<<< HEAD
+# https://www.robotstxt.org/robotstxt.html
+=======
+<<<<<<< HEAD
+# https://www.robotstxt.org/robotstxt.html
+=======
+>>>>>>> 2ea4618 (first commit)
+>>>>>>> f71079b (second commit)
+User-agent: *
+Disallow:

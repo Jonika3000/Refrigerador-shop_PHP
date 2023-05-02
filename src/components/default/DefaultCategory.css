@@ -1,0 +1,16 @@
+.CenterContent {
+    display: flex;
+    justify-Content: left;
+    align-Items: center;
+    height: 100%;
+}
+.CategoryList{
+    margin: 0 auto;
+    list-style: none;
+}
+.CategoryList li{
+    display: block;
+}
+.CategoryList li a{
+    font-size: 34px;
+}

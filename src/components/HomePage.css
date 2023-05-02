@@ -1,0 +1,33 @@
+*{
+    margin: 0px;
+
+}
+.CenterContent {
+    display: flex;
+    justify-Content: left;
+    align-Items: center;
+    height: 100%;
+}
+a{
+    color: white !important;
+    font-size: 21px;
+    max-width: 300px;
+    text-align: left;
+    text-decoration: none;
+}
+.MainHome{
+    height: 91vh;
+}
+.ButtonShop{
+    height: 45px;
+    width: 100px;
+    border: 0px;
+    font-size: 20px;
+    margin-top: 2rem;
+    color: white;
+    text-decoration: none;
+    background-color: #8bc34a;
+}
+.ButtonShop:hover{
+    background-color: #589413;
+}
