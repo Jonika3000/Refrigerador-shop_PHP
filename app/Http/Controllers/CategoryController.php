@@ -8,7 +8,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $list = Category::all();
+        $list = Category::paginate(2);
         return response()->json($list,200);
     }
     public function store(Request $request)
