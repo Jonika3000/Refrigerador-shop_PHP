@@ -85,14 +85,17 @@ class FrontEndController extends Controller
     public function AddItem(Request $request)
     {
         $input = $request->all();
-        //php artisan storage:link
-        $filename = uniqid(). '.' .$request->file("image")->getClientOriginalExtension();
-        Storage::disk('local')->put("public/uploads/".$filename,file_get_contents($request->file("image")));
-        $input["image"] = $filename;
-        //$file = $request->file('image');
-        //$path = Storage::disk('public')->putFile('uploads', $file);
 
-        $category = Category::create($input);
+        $filename = uniqid(). '.' .$request->file("image")->getClientOriginalExtension();
+        Storage::disk('local')->put("public/images/categories/".$filename,file_get_contents($request->file("image")));
+        $input["image"] = $filename;
+        print($input["image"]);
+        if($input["status"])
+            $input["status"] = 1;
+        else
+            $input["status"] = 0;
+
+        $category = item::create($input);
         return response()->json($category);
     }
     public function product($slug)
