@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Validator;
 use Storage;
 class FrontEndController extends Controller
@@ -32,6 +33,11 @@ class FrontEndController extends Controller
     public function indexWithoutPagginate()
     {
         $list = Category::All();
+        return response()->json($list,200);
+    }
+    public function ItemsWithoutPagginate()
+    {
+        $list = item::All();
         return response()->json($list,200);
     }
     /**
@@ -85,25 +91,72 @@ class FrontEndController extends Controller
     public function AddItem(Request $request)
     {
         $input = $request->all();
-
+        if (!$request->has('image')) {
+            return response()->json(['message' => 'Missing file'], 422);
+        }
         $filename = uniqid(). '.' .$request->file("image")->getClientOriginalExtension();
-        Storage::disk('local')->put("public/images/categories/".$filename,file_get_contents($request->file("image")));
-        $input["image"] = $filename;
-        print($input["image"]);
-        if($input["status"])
-            $input["status"] = 1;
-        else
-            $input["status"] = 0;
+        Storage::disk('local')->put("public/uploads/".$filename,file_get_contents($request->file("image")));
+        //$file = $request->file('image');
+        //$name = Str::random(10);
+        //$url = Storage::putFileAs('images', $file, $name . '.' . $file->extension());
 
-        $category = item::create($input);
-        return response()->json($category);
+        $product =  item::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'categoryId' => $request->categoryId,
+            'imagePrev' =>  $filename
+        ]);
+        return $product;
     }
+    public function updateItem($id ,Request $request )
+    {
+        $item = item::findOrFail($id);
+        if($request->imagePrev != ''){
+            $path = public_path().'/uploads/images/';
+
+            //code for remove old file
+            if($item->imagePrev != ''  && $item->imagePrev != null){
+                $file_old = $path.$item->file;
+                unlink($file_old);
+            }
+
+            //upload new file
+            $file = $request->file;
+            $filename = $file->getClientOriginalName();
+            $file->move($path, $filename);
+
+            //for update in table
+            $item->update(['imagePrev' => $filename]);
+        }
+        else
+        {
+            return response()->json(['message' => 'Missing file'], 422);
+        }
+
+       // if (!$request->has('image')) {
+         //   return response()->json(['message' => 'Missing file'], 422);
+        //}
+          //  $filename = uniqid(). '.' .$request->file("image")->getClientOriginalExtension();
+            //Storage::disk('local')->put("public/uploads/".$filename,file_get_contents($request->file("image")));
+            //$item->imagePrev = $filename;
+
+        $item->name = $request->input('name', $item->name);
+        $item->description = $request->input('description', $item->description);
+        $item->price = $request->input('price', $item->price);
+        $item->categoryId = $request->input('categoryId', $item->categoryId);
+
+        $item->save();
+
+        return response()->json($item);
+    }
+
     public function product($slug)
     {
         $category = Category::where('slug', $slug)->first();
 
         if ($category) {
-            $item = item::where('id', $category->id)->get();
+            $item = item::where('categoryId', $category->id)->get();
             if ($item) {
                 return response()->json([
                     'status'=>200,
@@ -126,5 +179,17 @@ class FrontEndController extends Controller
                 'message'=>'no category'
             ]);
         }
+    }
+    public function DeleteItem($id)
+    {
+        $item = Item::where('id', $id)->first();
+        if (Storage::disk('public')->exists('uploads/' . $item['imagePrev'])) {
+            Storage::disk('public')->delete('uploads/' . $item['imagePrev']);
+        }
+        else{
+            return response()->json(['message' => 'Missing file'], 422);
+        }
+        $item->delete();
+        return redirect()->back()->with('success', 'Item Delete!');
     }
 }
