@@ -25,4 +25,4 @@ Route::get('/clearCategory', [FrontEndController::class,'indexWithoutPagginate']
 Route::post("/AddItem", [FrontEndController::class, 'AddItem']);
 Route::delete("DeleteItem/{id}", [FrontEndController::class, 'DeleteItem']);
 Route::get("/clearItems", [FrontEndController::class, 'ItemsWithoutPagginate']);
-Route::put('/itemUpdate/{id}', [FrontEndController::class, 'updateItem']);
+Route::post('/itemUpdate/{id}', [FrontEndController::class, 'update']);

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Validator;
 use Storage;
+use function Psy\debug;
+
 class FrontEndController extends Controller
 {
     /**
@@ -88,7 +90,7 @@ class FrontEndController extends Controller
         $category = Category::create($input);
         return response()->json($category);
     }
-    public function AddItem(Request $request)
+    public function AddItem(Request $request) //добавлення товара, приймає товар, далі перевірка чи є картинка, і створення обєкта
     {
         $input = $request->all();
         if (!$request->has('image')) {
@@ -109,49 +111,37 @@ class FrontEndController extends Controller
         ]);
         return $product;
     }
-    public function updateItem($id ,Request $request )
+    public function update(Request $request, $id) //регування товара, приймає нові дані товара і ід якого редагувати
     {
         $item = item::findOrFail($id);
-        if($request->imagePrev != ''){
-            $path = public_path().'/uploads/images/';
+        error_log($item);
+        $item->fill([
+            'name' => $request->input('name', $item->name),
+            'description' => $request->input('description', $item->description),
+            'price' => $request->input('price', $item->price),
+            'categoryId' => $request->input('categoryId', $item->categoryId),
+        ]);
 
-            //code for remove old file
-            if($item->imagePrev != ''  && $item->imagePrev != null){
-                $file_old = $path.$item->file;
+        if ($request->hasFile('imagePrev')) {
+            $file = $request->file('imagePrev');
+            $filename = $file->getClientOriginalName();
+            $path = public_path().'\\storage\\uploads\\';
+
+            if ($item->imagePrev != '' && $item->imagePrev != null) {
+                $file_old = $path.$item->imagePrev;
                 unlink($file_old);
             }
 
-            //upload new file
-            $file = $request->file;
-            $filename = $file->getClientOriginalName();
             $file->move($path, $filename);
-
-            //for update in table
-            $item->update(['imagePrev' => $filename]);
+            $item->imagePrev = $filename;
         }
-        else
-        {
-            return response()->json(['message' => 'Missing file'], 422);
-        }
-
-       // if (!$request->has('image')) {
-         //   return response()->json(['message' => 'Missing file'], 422);
-        //}
-          //  $filename = uniqid(). '.' .$request->file("image")->getClientOriginalExtension();
-            //Storage::disk('local')->put("public/uploads/".$filename,file_get_contents($request->file("image")));
-            //$item->imagePrev = $filename;
-
-        $item->name = $request->input('name', $item->name);
-        $item->description = $request->input('description', $item->description);
-        $item->price = $request->input('price', $item->price);
-        $item->categoryId = $request->input('categoryId', $item->categoryId);
 
         $item->save();
 
         return response()->json($item);
     }
 
-    public function product($slug)
+    public function product($slug)//отмати продукти по slug який міститься в категорії
     {
         $category = Category::where('slug', $slug)->first();
 
@@ -180,7 +170,7 @@ class FrontEndController extends Controller
             ]);
         }
     }
-    public function DeleteItem($id)
+    public function DeleteItem($id) //видалення товара по id
     {
         $item = Item::where('id', $id)->first();
         if (Storage::disk('public')->exists('uploads/' . $item['imagePrev'])) {
