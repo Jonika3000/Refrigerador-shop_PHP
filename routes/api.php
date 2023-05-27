@@ -3,7 +3,7 @@
 use App\Http\Controllers\FrontEndController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,3 +26,13 @@ Route::post("/AddItem", [FrontEndController::class, 'AddItem']);
 Route::delete("DeleteItem/{id}", [FrontEndController::class, 'DeleteItem']);
 Route::get("/clearItems", [FrontEndController::class, 'ItemsWithoutPagginate']);
 Route::post('/itemUpdate/{id}', [FrontEndController::class, 'update']);
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+], function ($router) {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);
+});

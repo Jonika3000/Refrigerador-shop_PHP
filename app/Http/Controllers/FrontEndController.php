@@ -27,6 +27,10 @@ class FrontEndController extends Controller
      *     @OA\Response(response="200", description="List Categories.")
      * )
      */
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['index']]);
+    }
     public function index()
     {
         $list = Category::paginate(2);
