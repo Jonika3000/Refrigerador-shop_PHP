@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Category;
+use App\Models\Images;
 use App\Models\item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -88,9 +89,6 @@ class FrontEndController extends Controller
         if($validator->fails()){
             return response()->json($validator->errors(), 400);
         }
-        $filename = uniqid(). '.' .$request->file("image")->getClientOriginalExtension();
-        Storage::disk('local')->put("public/uploads/".$filename,file_get_contents($request->file("image")));
-        $input["image"] = $filename;
         $category = Category::create($input);
         return response()->json($category);
     }
@@ -173,6 +171,21 @@ class FrontEndController extends Controller
                 'message'=>'no category'
             ]);
         }
+    }
+    public function  AddImage(Request $request)
+    {
+        $input = $request->all();
+        if (!$request->has('url')) {
+            return response()->json(['message' => 'Missing file'], 422);
+        }
+        $filename = uniqid() . '.' . $request->file("url")->getClientOriginalExtension();
+        $request->file('url')->move(public_path('uploads'), $filename);
+        $input["url"] = $filename;
+        $item =  Images::create([
+            'itemId' => $request->itemId,
+            'url' => $input["url"]
+        ]);
+        return $item;
     }
     public function DeleteItem($id) //видалення товара по id
     {

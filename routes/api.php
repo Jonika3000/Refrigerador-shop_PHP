@@ -23,6 +23,7 @@ Route::post("/category", [FrontEndController::class, 'store']);
 Route::get('category/{slug}', [FrontEndController::class,'product']);
 Route::get('/clearCategory', [FrontEndController::class,'indexWithoutPagginate']);
 Route::post("/AddItem", [FrontEndController::class, 'AddItem']);
+Route::post("/AddImage", [FrontEndController::class, 'AddImage']);
 Route::delete("DeleteItem/{id}", [FrontEndController::class, 'DeleteItem']);
 Route::get("/clearItems", [FrontEndController::class, 'ItemsWithoutPagginate']);
 Route::post('/itemUpdate/{id}', [FrontEndController::class, 'update']);
